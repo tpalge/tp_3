@@ -154,22 +154,22 @@ class Grafo(object):
 		if (origen or destino) not in self.vertices:
 			raise KeyError('Vertices no se encuentran en el grafo.')
 		vecinos = []
-		vecinos.append((origen, None))
+		heapq.heapify(vecinos)
+		heapq.heappush(vecinos, (None, origen))
 		vuelta = {}
 		vuelta[origen] = None
 		costos = {}
-		costos[origen] = None
+		costos[origen] = 0
 		while len(vecinos) > 0:
-			actual = vecinos.pop(0)
-			if actual == destino:
+			actual = heapq.heappop(vecinos)
+			if actual[1] == destino:
 				break
-			for v in self.vertices[actual][1]:
-				nuevo_costo = costos[actual]+self.vertices[actual][1][v]
+			for v in self.vertices[actual[1]][1]:
+				nuevo_costo = costos[actual[1]]+self.vertices[actual[1]][1][v]
 				if (v not in costos) or (nuevo_costo < costos[v]):
 					costos[v] = nuevo_costo
-					vecinos.append((v, nuevo_costo))
-					sorted(vecinos, key=itemgetter(1)) #ordena de menor a mayor por el segundo elemento.
-					vuelta[v] = actual
+					heapq.heappush(vecinos, (nuevo_costo, v))
+					vuelta[v] = actual[1]
 		return _reconstruir_camino(vuelta, origen, destino)
     
     def mst(self):
